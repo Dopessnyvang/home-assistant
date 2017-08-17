@@ -34,7 +34,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
             elif model == 'ctrl_ln1':
                 devices.append(XiaomiGenericSwitch(device, 'Wall Switch LN',
                                                    'channel_0',
-                                                   False, gateway))
+                                                   True, gateway))
             elif model == 'ctrl_neutral2':
                 devices.append(XiaomiGenericSwitch(device, 'Wall Switch Left',
                                                    'channel_0',
@@ -46,11 +46,11 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
                 devices.append(XiaomiGenericSwitch(device,
                                                    'Wall Switch LN Left',
                                                    'channel_0',
-                                                   False, gateway))
+                                                   True, gateway))
                 devices.append(XiaomiGenericSwitch(device,
                                                    'Wall Switch LN Right',
                                                    'channel_1',
-                                                   False, gateway))
+                                                   True, gateway))
             elif model == '86plug':
                 devices.append(XiaomiGenericSwitch(device, 'Wall Plug',
                                                    'status', True, gateway))
