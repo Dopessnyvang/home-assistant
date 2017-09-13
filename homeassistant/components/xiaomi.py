@@ -39,6 +39,19 @@ def _validate_conf(config):
             raise vol.Invalid('Invalid key %s.'
                               ' Key must be 16 characters', key)
         res_gw_conf['key'] = key
+
+        host = gw_conf.get('host')
+        if host is not None:
+            _LOGGER.warning(
+                'IP address (host) of the gateway provided.'
+                'Discovery of this host will be skipped.')
+            res_gw_conf['host'] = host
+            port = gw_conf.get('port')
+            if port is not None:
+                res_gw_conf['port'] = port
+            else:
+                res_gw_conf['port'] = 9898
+
         res_config.append(res_gw_conf)
     return res_config
 
