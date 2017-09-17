@@ -42,15 +42,16 @@ def _validate_conf(config):
 
         host = gw_conf.get('host')
         if host is not None:
-            _LOGGER.warning(
-                'IP address (host) of the gateway provided.'
-                'Discovery of this host will be skipped.')
             res_gw_conf['host'] = host
             port = gw_conf.get('port')
             if port is not None:
                 res_gw_conf['port'] = port
             else:
                 res_gw_conf['port'] = 9898
+
+            _LOGGER.warning(
+                'Static address (%s:%s) of the gateway provided.'
+                'Discovery of this host will be skipped.', host, port)
 
         res_config.append(res_gw_conf)
     return res_config
@@ -102,7 +103,7 @@ def setup(hass, config):
         _LOGGER.error("No gateway discovered")
         return False
     hass.data[PY_XIAOMI_GATEWAY].listen()
-    _LOGGER.debug("Listening for broadcast")
+    _LOGGER.debug("Gateways discovered. Listening for broadcasts")
 
     for component in ['binary_sensor', 'sensor', 'switch', 'light', 'cover']:
         discovery.load_platform(hass, component, DOMAIN, {}, config)
