@@ -17,7 +17,7 @@ import voluptuous as vol
 
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS, ATTR_COLOR_TEMP, ATTR_ENTITY_ID, DOMAIN, PLATFORM_SCHEMA,
-    SUPPORT_BRIGHTNESS, SUPPORT_COLOR_TEMP, Light)
+    SUPPORT_BRIGHTNESS, SUPPORT_COLOR, SUPPORT_COLOR_TEMP, Light)
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_TOKEN
 from homeassistant.exceptions import PlatformNotReady
 import homeassistant.helpers.config_validation as cv
@@ -781,7 +781,7 @@ class XiaomiPhilipsMoonlightLamp(XiaomiPhilipsBulb):
     @property
     def supported_features(self):
         """Return the supported features."""
-        return SUPPORT_BRIGHTNESS | SUPPORT_COLOR_TEMP
+        return SUPPORT_BRIGHTNESS | SUPPORT_COLOR | SUPPORT_COLOR_TEMP
 
     async def async_update(self):
         """Fetch state from the device."""
