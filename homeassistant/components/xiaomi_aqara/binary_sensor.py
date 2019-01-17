@@ -20,6 +20,8 @@ ATTR_NO_MOTION_SINCE = 'No motion since'
 DENSITY = 'density'
 ATTR_DENSITY = 'Density'
 
+HARDWARE_MODIFIED = True
+NO_MOTION_TIMEOUT = 12
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Perform the setup for Xiaomi devices."""
@@ -28,7 +30,8 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
         for device in gateway.devices['binary_sensor']:
             model = device['model']
             if model in ['motion', 'sensor_motion', 'sensor_motion.aq2']:
-                devices.append(XiaomiMotionSensor(device, hass, gateway))
+                devices.append(XiaomiMotionSensor(device, hass, gateway,
+                                                  HARDWARE_MODIFIED))
             elif model in ['magnet', 'sensor_magnet', 'sensor_magnet.aq2']:
                 devices.append(XiaomiDoorSensor(device, gateway))
             elif model == 'sensor_wleak.aq1':
@@ -151,11 +154,12 @@ class XiaomiNatgasSensor(XiaomiBinarySensor):
 class XiaomiMotionSensor(XiaomiBinarySensor):
     """Representation of a XiaomiMotionSensor."""
 
-    def __init__(self, device, hass, xiaomi_hub):
+    def __init__(self, device, hass, xiaomi_hub, hardware_modified):
         """Initialize the XiaomiMotionSensor."""
         self._hass = hass
         self._no_motion_since = 0
         self._unsub_set_no_motion = None
+        self._hardware_modified = hardware_modified
         if 'proto' not in device or int(device['proto'][0:1]) == 1:
             data_key = 'status'
         else:
@@ -208,7 +212,7 @@ class XiaomiMotionSensor(XiaomiBinarySensor):
                 '11631#issuecomment-357507744).')
             return
 
-        if NO_MOTION in data:
+        if not self._hardware_modified and NO_MOTION in data:
             self._no_motion_since = data[NO_MOTION]
             self._state = False
             return True
@@ -218,12 +222,13 @@ class XiaomiMotionSensor(XiaomiBinarySensor):
             return False
 
         if value == MOTION:
-            if self._data_key == 'motion_status':
+            if self._data_key == 'motion_status' or self._hardware_modified:
+                delay = NO_MOTION_TIMEOUT if self._hardware_modified else 120
                 if self._unsub_set_no_motion:
                     self._unsub_set_no_motion()
                 self._unsub_set_no_motion = async_call_later(
                     self._hass,
-                    120,
+                    delay,
                     self._async_set_no_motion
                 )
 
