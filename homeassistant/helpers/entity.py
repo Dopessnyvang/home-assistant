@@ -28,11 +28,10 @@ def generate_entity_id(entity_id_format: str, name: Optional[str],
     if current_ids is None:
         if hass is None:
             raise ValueError("Missing required parameter currentids or hass")
-        else:
-            return run_callback_threadsafe(
-                hass.loop, async_generate_entity_id, entity_id_format, name,
-                current_ids, hass
-            ).result()
+        return run_callback_threadsafe(
+            hass.loop, async_generate_entity_id, entity_id_format, name,
+            current_ids, hass
+        ).result()
 
     name = (slugify(name) or slugify(DEVICE_DEFAULT_NAME)).lower()
 
@@ -319,7 +318,7 @@ class Entity:
     @callback
     def async_schedule_update_ha_state(self, force_refresh=False):
         """Schedule an update ha state change task."""
-        self.hass.async_add_job(self.async_update_ha_state(force_refresh))
+        self.hass.async_create_task(self.async_update_ha_state(force_refresh))
 
     async def async_device_update(self, warning=True):
         """Process 'update' or 'async_update' from entity.

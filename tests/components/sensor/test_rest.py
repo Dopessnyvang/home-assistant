@@ -11,7 +11,6 @@ from homeassistant.exceptions import PlatformNotReady
 from homeassistant.setup import setup_component
 import homeassistant.components.sensor as sensor
 import homeassistant.components.sensor.rest as rest
-from homeassistant.const import STATE_UNKNOWN
 from homeassistant.helpers.config_validation import template
 
 from tests.common import get_test_home_assistant, assert_setup_component
@@ -90,6 +89,7 @@ class TestRestSensorSetup(unittest.TestCase):
                     'name': 'foo',
                     'unit_of_measurement': 'MB',
                     'verify_ssl': 'true',
+                    'timeout': 30,
                     'authentication': 'basic',
                     'username': 'my username',
                     'password': 'my password',
@@ -113,6 +113,7 @@ class TestRestSensorSetup(unittest.TestCase):
                     'name': 'foo',
                     'unit_of_measurement': 'MB',
                     'verify_ssl': 'true',
+                    'timeout': 30,
                     'authentication': 'basic',
                     'username': 'my username',
                     'password': 'my password',
@@ -175,7 +176,7 @@ class TestRestSensor(unittest.TestCase):
         self.rest.update = Mock(
             'rest.RestData.update', side_effect=self.update_side_effect(None))
         self.sensor.update()
-        assert STATE_UNKNOWN == self.sensor.state
+        assert self.sensor.state is None
         assert not self.sensor.available
 
     def test_update_when_value_changed(self):
@@ -281,8 +282,10 @@ class TestRestData(unittest.TestCase):
         self.method = "GET"
         self.resource = "http://localhost"
         self.verify_ssl = True
+        self.timeout = 10
         self.rest = rest.RestData(
-            self.method, self.resource, None, None, None, self.verify_ssl)
+            self.method, self.resource, None, None, None, self.verify_ssl,
+            self.timeout)
 
     @requests_mock.Mocker()
     def test_update(self, mock_req):
